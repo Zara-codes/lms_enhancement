@@ -54,6 +54,7 @@ import { useSelector } from "react-redux";
 import { setAuth } from "./store/slices/authSlice";
 import { Profile } from "./components";
 import Loader from "./components/website/loader/Loader";
+import PaymentForm from "./components/website/Payment/PaymentForm";
 
 const App = () => {
   const { theme } = useSelector((state) => state.theme);
@@ -156,6 +157,7 @@ const App = () => {
             <Route path="returned-books" element={<ReturnedBooks />} />
             <Route path="profile" element={<Profile />} />
             <Route path="change-password" element={<ChangePassword />} />
+            <Route path="payment" element={<PaymentForm />} />
 
             <Route
               path="manage-clearance-form/:status"

@@ -13,8 +13,8 @@ async function sendMail({ to, from=ADMIN_MAIL, subject, text, html }) {
     port: SMTP_PORT,
     secure: false,
     auth: {
-      user: "screstaurant3@gmail.com",
-      pass: "rddz soyw maqo egcv",
+      user: "themadsarakhatun@gmail.com",
+      pass: "smzn pfcr slxk zzcm",
     },
   });
 

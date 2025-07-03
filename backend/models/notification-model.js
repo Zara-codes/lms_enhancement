@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 
 const notificationSchema = new mongoose.Schema({
   user: { 
@@ -26,7 +27,7 @@ const notificationSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Add pagination plugin
+
 notificationSchema.plugin(require('mongoose-aggregate-paginate-v2'));
 
 module.exports = mongoose.model('Notification', notificationSchema);

@@ -1,4 +1,4 @@
-// components/NotificationBell.jsx
+
 import { useContext, useEffect, useState } from 'react';
 import { SocketContext } from '../context/socketContext';
 import Badge from '@mui/material/Badge';

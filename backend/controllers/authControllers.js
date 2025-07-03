@@ -193,7 +193,7 @@ class AuthController {
       // console.log(`Email Send ! Your password reset link is ${resetToken}`);
       await sendMail({
         to: user.email,
-        from: "GDFlibrary@gmail.com",
+        from: "themadsarakhatun@gmail.com",
         subject: "GDF Library Password Reset Link",
         text: `Hello ${user.name} ! Your password reset link is  http://localhost:5173/new-password/${resetToken}/, Click on that link in order to change password`,
       });

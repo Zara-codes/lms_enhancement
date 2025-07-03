@@ -23,7 +23,7 @@ const transactionSchema = new mongoose.Schema(
     rollNumber: {
       type: String,
     },
-    /* BOOLEAN VALUE THAT INDICATE THAT BOOK IS BORROWED BY STUDENT OR RETURNED IT  */
+    
     isBorrowed: {
       type: Boolean,
       default: true,

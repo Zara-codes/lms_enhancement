@@ -1,51 +1,41 @@
-// services/notificationService.js
-const Notification = require('../models/Notification');
+// server/services/notificationService.js
+import Notification from '../models/Notification.js';
 
-class NotificationService {
-  static async createNotification({
-    userId,
-    message,
-    type = 'system',
-    metadata = {}
-  }) {
+export default class NotificationService {
+  static async create({ userId, message, type = 'system', link = null }) {
     try {
       // 1. Save to database
       const notification = await Notification.create({
         user: userId,
         message,
         type,
-        metadata
+        link
       });
 
       // 2. Send real-time notification
-      if (global.io && userSocketMap.has(userId.toString())) {
+      if (global.io && global.userSocketMap.has(userId.toString())) {
         global.io.to(userId.toString()).emit('new_notification', {
           _id: notification._id,
           message,
           type,
-          createdAt: notification.createdAt,
-          isRead: false
+          isRead: false,
+          link,
+          createdAt: notification.createdAt
         });
       }
 
       return notification;
     } catch (error) {
       console.error('Notification error:', error);
+      throw error;
     }
   }
 
+  // Fetch user notifications (paginated)
   static async getUserNotifications(userId, page = 1, limit = 10) {
-    const options = {
-      page,
-      limit,
-      sort: { createdAt: -1 }
-    };
-
-    return await Notification.aggregatePaginate(
-      { user: userId },
-      options
-    );
+    return await Notification.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
   }
 }
-
-module.exports = NotificationService;

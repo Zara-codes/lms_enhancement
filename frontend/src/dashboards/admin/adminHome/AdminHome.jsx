@@ -134,18 +134,18 @@ const AdminHome = () => {
             </tr>
           </thead>
           <tbody>
-            {data?.last5ReturnedBooks?.map((transaction, index) => {
-              return (
-                <tr key={transaction._id}>
-                  <td>{index + 1}</td>
-                  <td>{transaction.user.name}</td>
-                  <td>{transaction.book.title}</td>
-                  <td>{formatDate(transaction.borrowDate)}</td>
-                  <td>{formatDate(transaction.returnedDate)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
+  {data?.last5ReturnedBooks?.map((transaction, index) => {
+    return (
+      <tr key={transaction._id || index}>
+        <td>{index + 1}</td>
+        <td>{transaction.user?.name || "Unknown"}</td> {/* Safe access */}
+        <td>{transaction.book?.title || "Unknown"}</td> {/* Safe access */}
+        <td>{formatDate(transaction.borrowDate)}</td>
+        <td>{formatDate(transaction.returnedDate)}</td>
+      </tr>
+    );
+  })}
+</tbody>
         </table>
       </div>
     </div>

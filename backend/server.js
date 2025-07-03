@@ -28,7 +28,7 @@ app.use(express.json({ limit: "5mb" }));
 
 const corsOptions = {
   credentials: true,
-  origin: "http://localhost:5173", // No trailing slash
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -77,30 +77,38 @@ app.use("/api/clearance", clearanceRouter);
 app.use(errorHandlerMiddleware);
 
 const httpServer = createServer(app);
+
 const io = new Server(httpServer, {
-  pingTimeout: 60000,
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: process.env.FRONTEND_URL, 
     methods: ["GET", "POST"]
   }
 });
 
-const userSocketMap = new Map();
 
+const userSocketMap = new Map(); 
 io.on('connection', (socket) => {
-  console.log('New client connected');
+  console.log('New client connected:', socket.id);
 
-  socket.on('setup', (userId) => {
+
+  socket.on('register', (userId) => {
     socket.join(userId);
     userSocketMap.set(userId, socket.id);
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    console.log('Client disconnected:', socket.id);
     userSocketMap.forEach((value, key) => {
       if (value === socket.id) userSocketMap.delete(key);
     });
   });
 });
 
+
 global.io = io;
+global.userSocketMap = userSocketMap;
+
+
+httpServer.listen(process.env.PORT, () => {
+  console.log(`Server running with Socket.io on port ${process.env.APP_PORT}`);
+});
