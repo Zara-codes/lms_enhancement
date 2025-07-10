@@ -23,12 +23,11 @@ const transactionSchema = new mongoose.Schema(
     rollNumber: {
       type: String,
     },
-    
+
     isBorrowed: {
       type: Boolean,
       default: true,
     },
-    /* DATES */
     borrowDate: {
       type: Date,
       default: Date.now,
@@ -79,6 +78,25 @@ const reservationSchema = new mongoose.Schema({
   },
 });
 
+// const fineSchema = new mongoose.Schema({
+//   transaction: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: "Transaction",
+//     required: true,
+//   },
+//   fine: {
+//     type: Number,
+//     required: true,
+//   },
+//   paidDate: {
+//     type: Date,
+//     default: Date.now,
+//   },
+// });
+
+
+// Payment Integration
+
 const fineSchema = new mongoose.Schema({
   transaction: {
     type: mongoose.Schema.Types.ObjectId,
@@ -93,10 +111,37 @@ const fineSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+  status: {
+    type: String,
+    required: true,
+    enum: ["PENDING", "COMPLETE", "REUNDED"],
+    default: "PENDING"
+  }
+}, {timestamps: true});
 
+// Payment Integration
+const esewaTransactionSchema = new mongoose.Schema({
+    product_id: {
+        type: String,
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true,
+        min: 0,
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ["PENDING", "COMPLETE", "REUNDED"],
+        default: "PENDING"
+    }
+}, {timestamps: true})
+const esewaTransactionModel = mongoose.model("Esewa Transaction", esewaTransactionSchema);
+
+// End
 const ReservationModel = mongoose.model("Reservation", reservationSchema);
 const TransactionModel = mongoose.model("Transaction", transactionSchema);
 const FineModel = mongoose.model("Fine", fineSchema);
 
-export { ReservationModel, TransactionModel, FineModel };
+export { ReservationModel, TransactionModel, FineModel, esewaTransactionModel };

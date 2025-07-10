@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppBar, SideBar } from "../../../components";
 import {Outlet} from "react-router-dom";
-import {MdOutlineDashboard,MdFeedback, MdCancel, MdPendingActions} from "react-icons/md";
+import {MdOutlineDashboard,MdFeedback, MdCancel, MdPendingActions, MdPayment} from "react-icons/md";
 import {FaBook,FaUserAlt,FaLock, FaWpforms} from "react-icons/fa";
 import {ImBooks} from "react-icons/im";
 import {AiFillBell} from "react-icons/ai";
@@ -55,6 +55,27 @@ const UserDashboardLayout = () => {
         }
       ] 
     },
+    // Payment Integration
+    {
+      id: 3,
+      title : "Fines",
+      listItems:[
+        {
+          id : 1,
+          text : "My Fines",
+          link : "fines",
+          icon : <MdPayment/>
+        },
+        {
+          id : 2,
+          text : "Pay Fines",
+          link : "payment",
+          icon : <MdPayment/>
+        }
+      ]
+    },
+
+    // end
     {
       ...((auth?.user?.role === "HOD" ||auth?.user?.role === "Clerk"  ) && {
         id: 6,
@@ -85,7 +106,7 @@ const UserDashboardLayout = () => {
     },
   
     {
-      id: 3,
+      id: 4,
       title : "Account",
       listItems:[
         {

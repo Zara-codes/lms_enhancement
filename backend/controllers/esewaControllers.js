@@ -1,65 +1,59 @@
-// controllers/esewaController.js
-const axios = require('axios');
+import { EsewaPaymentGateway,EsewaCheckStatus } from "esewajs"; //we install our package hehe
+import { esewaTransactionModel } from "../models/transaction-models.js";
 
-const ESewaConfig = {
-  MERCHANT_ID: process.env.ESEWA_MERCHANT_ID,
-  SECRET_KEY: process.env.ESEWA_SECRET_KEY,
-  BASE_URL: process.env.NODE_ENV === 'production' 
-    ? 'https://epay.esewa.com.np' 
-    : 'https://rc-epay.esewa.com.np' // Test URL
-};
+const EsewaInitiatePayment=async(req,res)=>{
+      const { amount, productId } = req.body;  //data coming from frontend
+try {
+      const  reqPayment=await EsewaPaymentGateway(
+        amount,0,0,0,productId,process.env.MERCHANT_ID,process.env.SECRET,process.env.SUCCESS_URL,process.env.FAILURE_URL,process.env.ESEWAPAYMENT_URL,undefined,undefined)
+  if(!reqPayment){
+    return res.status(400).json("error sending data")
 
-exports.initiatePayment = async (req, res) => {
-  const { amount, transactionId, fineId } = req.body;
-  
-  const payload = {
-    amount: amount,
-    tax_amount: 0,
-    total_amount: amount,
-    transaction_uuid: transactionId,
-    product_code: 'LIBRARY_FINE',
-    product_service_charge: 0,
-    product_delivery_charge: 0,
-    success_url: `${process.env.FRONTEND_URL}/payment/success?fineId=${fineId}`,
-    failure_url: `${process.env.FRONTEND_URL}/payment/failure`,
-    signed_field_names: 'total_amount,transaction_uuid,product_code',
-  };
-
-  // Generate signature
-  const signatureData = `${payload.total_amount},${payload.transaction_uuid},${payload.product_code}`;
-  const signature = require('crypto')
-    .createHmac('sha256', ESewaConfig.SECRET_KEY)
-    .update(signatureData)
-    .digest('base64');
-
-  payload.signature = signature;
-
-  res.json({
-    url: `${ESewaConfig.BASE_URL}/epay/main`,
-    params: payload
-  });
-};
-
-exports.verifyPayment = async (req, res) => {
-  const { data } = req.body;
-  
-  try {
-    const verificationUrl = `${ESewaConfig.BASE_URL}/api/epay/transaction/status`;
-    
-    const response = await axios.post(verificationUrl, {
-      merchant_id: ESewaConfig.MERCHANT_ID,
-      transaction_uuid: data.transaction_uuid,
-      signed_field_names: 'transaction_uuid,status',
-      signature: data.signature
-    });
-
-    if (response.data.status === 'COMPLETE') {
-      // Update fine status in your database
-      return res.json({ success: true, data: response.data });
-    }
-
-    res.status(400).json({ success: false, message: 'Payment verification failed' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
-};
+        if (reqPayment.status === 200) {
+                  const transaction = new esewaTransactionModel({
+                    product_id: productId,
+                    amount: amount,
+                  });
+                  await transaction.save();
+                  console.log("transaction passed   ")
+                  return res.send({
+                    url: reqPayment.request.res.responseUrl,
+                  });
+                }
+   }
+  catch (error) {
+  return res.status(400).json("error sending data")
+
+   }}
+
+
+
+const paymentStatus=async (req, res) => {
+              const { product_id } = req.body; // Extract data from request body
+              try {
+                // Find the transaction by its signature
+                const transaction = await esewaTransactionModel.findOne({ product_id });
+                if (!transaction) {
+                  return res.status(400).json({ message: "Transaction not found" });
+                }
+            
+           const paymentStatusCheck=await   EsewaCheckStatus(transaction.amount,transaction.product_id,process.env.MERCHANT_ID,process.env.ESEWAPAYMENT_STATUS_CHECK_URL)
+        
+            
+            
+                if (paymentStatusCheck.status === 200) {
+
+                  transaction.status = paymentStatusCheck.data.status;
+                  await transaction.save();
+                  return res
+                    .status(200)
+                    .json({ message: "Transaction status updated successfully" });
+                }
+              } catch (error) {
+                console.error("Error updating transaction status:", error);
+                res.status(500).json({ message: "Server error", error: error.message });
+              }
+            };
+
+  export {EsewaInitiatePayment,paymentStatus}

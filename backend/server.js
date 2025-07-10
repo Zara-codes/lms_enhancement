@@ -22,6 +22,7 @@ import {
   transactionRouter,
 } from "./routes/index.js";
 import { errorHandlerMiddleware } from "./middlewares/index.js";
+import { EsewaInitiatePayment, paymentStatus } from "./controllers/esewaControllers.js";
 
 const app = express();
 app.use(express.json({ limit: "5mb" }));
@@ -74,6 +75,7 @@ app.use("/api/transactions", transactionRouter);
 app.use("/api/genral", genralRouter);
 app.use("/api/clearance", clearanceRouter);
 
+
 app.use(errorHandlerMiddleware);
 
 const httpServer = createServer(app);
@@ -112,3 +114,6 @@ global.userSocketMap = userSocketMap;
 httpServer.listen(process.env.PORT, () => {
   console.log(`Server running with Socket.io on port ${process.env.APP_PORT}`);
 });
+
+app.post("/initiate-payment", EsewaInitiatePayment);
+app.post("/payment-status", paymentStatus);
