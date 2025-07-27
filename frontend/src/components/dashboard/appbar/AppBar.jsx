@@ -33,7 +33,7 @@ function AppBar({ open, setOpen }) {
         </Link>
       </div>
 
-      {/* righside icons and profile */}
+      {/* rightside icons and profile */}
       <div className="right">
 
       <button

@@ -1,10 +1,13 @@
-const express = require('express');
-const { initiatePayment, verifyPayment } = require('../controllers/esewaController');
-const { protect } = require('../middleware/authMiddleware');
+import { Router } from "express";
+import { getEsewaPaymentHash, verifyEsewaPayment } from "../services/esewa.js"
+import { PayFineModel } from "../models/transaction-models.js";
+import PaymentModel from "../models/payment-model.js";
+import { initiateEsewaPayment } from "../controllers/esewaPaymentControllers.js";
 
-const router = express.Router();
+const paymentRoutes = Router()
 
-router.post('/esewa/initiate', protect, initiatePayment);
-router.post('/esewa/verify', protect, verifyPayment);
+// outer.route("/register").post(registerUser)
 
-module.exports = router;
+paymentRoutes.route("/initialize-esewa").post(initiateEsewaPayment)
+
+export default paymentRoutes

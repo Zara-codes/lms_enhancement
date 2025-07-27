@@ -83,7 +83,7 @@ const menu = [
       },
       {
         id: 4,
-        text: "Departements",
+        text: "Departments",
         link: "manage-departements",
         icon: <BiCategoryAlt />,
       },

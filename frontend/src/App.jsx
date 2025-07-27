@@ -57,6 +57,7 @@ import { useSelector } from "react-redux";
 import { setAuth } from "./store/slices/authSlice";
 import { Profile } from "./components";
 import Loader from "./components/website/loader/Loader";
+import Test from "./components/payment/Test.jsx";
 const App = () => {
   const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
@@ -84,6 +85,11 @@ const App = () => {
     <div className={`${theme}`}>
       <Routes>
 
+        {/* Dummy */}
+        {/* <Route path="/test" element={<Test />} />
+        <Route path="/payment" element={<PaymentForm />} />
+        <Route path="/payment-success" element={<PaymentForm />} /> */}
+        {/* <Route path="/payment-failure" element={<Failure />} /> */}
         <Route path="/" element={<WebsiteLayout />}>
           <Route index element={<Home />} />
           <Route path="books" element={<Books />} />
@@ -162,7 +168,7 @@ const App = () => {
               <Route path="payment-success" element={<Success />} />
               <Route path="payment-failure" element={<Failure />} />
             </Route>
-
+ 
 
             <Route
               path="manage-clearance-form/:status"

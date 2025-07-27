@@ -28,7 +28,7 @@ const DataList = ({heading,subheading,data,columns,keys}) => {
                     <td>Data Sturcture and Algorithm</td>
                     <td>Sarah Kn</td>
                     <td>Computer Science</td>
-                    <td>13 Fab 2023</td>
+                    <td>12 Jan 2025</td>
                   </tr>
                     })
                   }

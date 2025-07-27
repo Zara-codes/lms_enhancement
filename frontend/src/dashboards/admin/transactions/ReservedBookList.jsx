@@ -58,7 +58,7 @@ const ReservedBookList = () => {
               <td>ISBN</td>
               <td>Title</td>
               <td>User Name</td>
-              <td>Roll Number/Email</td>
+              <td>Email</td>
               <td>Reserved Date</td>
             </tr>
           </thead>

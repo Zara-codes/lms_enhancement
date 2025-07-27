@@ -15,6 +15,12 @@ transactionRouter.get("/admin-dashboard-stats",authMiddleware,adminMiddleware,tr
 
 transactionRouter.post("/return-book",authMiddleware,adminMiddleware,transactionControllers.returnBook);
 transactionRouter.post("/pay-fine",authMiddleware,adminMiddleware,transactionControllers.payFine);
+
+// Payment Integration
+transactionRouter.post("/pay-fine-esewa",authMiddleware,adminMiddleware,transactionControllers.EsewaInitiatePayment);
+transactionRouter.post("/pay-fine-status",authMiddleware,adminMiddleware,transactionControllers.paymentStatus);
+// End
+
 transactionRouter.get("/reserved-books",authMiddleware,adminMiddleware,transactionControllers.getReservedBooks);
 transactionRouter.get("/issued-books",authMiddleware,adminMiddleware,transactionControllers.getIssuedBooks);
 transactionRouter.get("/returned-books",authMiddleware,adminMiddleware,transactionControllers.getReturnedBooks);

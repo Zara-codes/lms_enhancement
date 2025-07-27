@@ -43,7 +43,7 @@ async function generateClearanceForm(data, fileName) {
   jumpLine(doc, 5);
 
   /* ################### TEXT ##################### */
-  doc.fontSize(10).fill("#021c27").text("Govt. Graduate College, Jhelum", {
+  doc.fontSize(10).fill("#021c27").text("Gyan Deep College, Tulsipur, Dang", {
     align: "center",
   });
   jumpLine(doc, 1);
@@ -62,7 +62,7 @@ async function generateClearanceForm(data, fileName) {
   doc
     .fontSize(10)
     .text(
-      `This is to certify that ${data?.studentName} (${data?.studentRollNumber}) has successfully met all academic and administrative requirements at Govt.Graduate College, Jhelum. The requested clearance for Graduation has been approved by Librarian, HOD and Clerk.`,
+      `This is to certify that ${data?.studentName} (${data?.studentRollNumber}) has successfully met all academic and administrative requirements at Gyan Deep College, Tulsipur, Dang. The requested clearance for Graduation has been approved by Librarian, HOD and Clerk.`,
       {
         align: "center",
       }
@@ -99,7 +99,7 @@ async function generateClearanceForm(data, fileName) {
   doc
     .fontSize(10)
     .fill("#021c27")
-    .text("John Doe", startLine1, signatureHeight + 10, {
+    .text("Sara Kn", startLine1, signatureHeight + 10, {
       columns: 1,
       columnGap: 0,
       height: 40,
@@ -143,7 +143,7 @@ async function generateClearanceForm(data, fileName) {
   doc
     .fontSize(10)
     .fill("#021c27")
-    .text("Jane Doe", startLine3, signatureHeight + 10, {
+    .text("Zehra", startLine3, signatureHeight + 10, {
       columns: 1,
       columnGap: 0,
       height: 40,

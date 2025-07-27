@@ -15,7 +15,9 @@ import {
   FineModel,
   ReservationModel,
   TransactionModel,
+  PayFineModel
 } from "../models/transaction-models.js";
+import { EsewaPaymentGateway, EsewaCheckStatus } from "esewajs";
 
 import UserModel from "../models/user-model.js";
 import {
@@ -68,7 +70,7 @@ class TransactionController {
         Issued: numberOfBorrowedBooks,
         Available: numberOfAvailableBooks,
       };
-      
+
 
       /* NUMBER OF BOOKS PER MONTH IN CURRENT YEAR... */
       const last12MonthsData = {};
@@ -150,22 +152,21 @@ class TransactionController {
       if (book.status === "Issued" || book.status === "Lost") {
         return next(
           ErrorHandlerService.badRequest(
-            `${
-              book.status === "Issued"
-                ? "OOPS ! Book is already Issued"
-                : "OOPS ! This book is lost!"
+            `${book.status === "Issued"
+              ? "OOPS ! Book is already Issued"
+              : "OOPS ! This book is lost!"
             }`
           )
         );
       }
-      
+
       if (book.status === "Reserved") {
         const reservedBook = await ReservationModel.findOne({
           book: book._id,
         }).populate("user");
-      
+
         if (user.email === reservedBook?.user?.email) {
-        
+
           await reservedBook.deleteOne();
         } else {
           return next(
@@ -179,9 +180,9 @@ class TransactionController {
       const dueDate = new Date(currentDate);
       dueDate.setDate(
         currentDate.getDate() +
-          (user.role === "Student"
-            ? NUMBER_OF_DAYS_OF_STUDENT
-            : NUMBER_OF_DAYS_OF_TEACHER_OR_HOD)
+        (user.role === "Student"
+          ? NUMBER_OF_DAYS_OF_STUDENT
+          : NUMBER_OF_DAYS_OF_TEACHER_OR_HOD)
       );
 
       /* ISSUED BOOK */
@@ -203,7 +204,7 @@ class TransactionController {
     }
   }
 
-  
+
   async userInfo(req, res, next) {
     /* SEARCH BY EMAIL OR ROLL NUMBER */
     const { qEmail, qRollNumber } = req.query;
@@ -224,7 +225,7 @@ class TransactionController {
       if (!user) {
         return next(ErrorHandlerService.notFound("User Not Found"));
       }
-      
+
       const borrowedBooks = await TransactionModel.find(
         {
           user: user._id,
@@ -232,7 +233,7 @@ class TransactionController {
         },
         "book borrowDate"
       ).populate("book", "ISBN title ");
-      
+
       const numberOfBorrowedBooks = borrowedBooks.length;
       const maxBooksAllowed = {
         Student: NUMBER_OF_BOOKS_ALLOWED_TO_STUDENT,
@@ -288,7 +289,7 @@ class TransactionController {
   }
 
   async returnBook(req, res, next) {
-    
+
     const { transactionID } = req.body;
     if (!transactionID) {
       return next(
@@ -350,6 +351,84 @@ class TransactionController {
     }
   }
 
+  // Payment Integration
+  async EsewaInitiatePayment(req, res) {
+    const { transactionID } = req.body
+    const { amount, productId } = req.body;  //data coming from frontend
+    try {
+      const transaction = await TransactionModel.findOne({
+        _id: transactionID
+      })
+
+      if(!transaction) {
+        return res.status(400).json("Transaction data does not exist")
+      }
+
+      const amount = transaction.fine
+      const product_id = generateUniqueId()
+      const reqPayment = await EsewaPaymentGateway(
+        amount, 
+        0,
+        0, 
+        0, 
+        productId, 
+        process.env.MERCHANT_ID, 
+        process.env.SECRET, 
+        process.env.SUCCESS_URL, 
+        process.env.FAILURE_URL, 
+        process.env.ESEWAPAYMENT_URL, 
+        undefined, undefined)
+      if (!reqPayment ) {
+        return res.status(400).json("error sending data")
+
+      }
+      if (reqPayment.status === 200) {
+        const transaction = new Transaction({
+          product_id: productId,
+          amount: amount,
+        });
+        await transaction.save();
+        console.log("transaction passed   ")
+        return res.send({
+          url: reqPayment.request.res.responseUrl,
+        });
+      }
+    }
+    catch (error) {
+      return res.status(400).json("error sending data")
+
+    }
+  }
+
+  async paymentStatus(req, res) {
+    const { product_id } = req.body; // Extract data from request body
+    try {
+      // Find the transaction by its signature
+      const transaction = await Transaction.findOne({ product_id });
+      if (!transaction) {
+        return res.status(400).json({ message: "Transaction not found" });
+      }
+
+      const paymentStatusCheck = await EsewaCheckStatus(transaction.amount, transaction.product_id, process.env.MERCHANT_ID, process.env.ESEWAPAYMENT_STATUS_CHECK_URL)
+
+
+
+      if (paymentStatusCheck.status === 200) {
+
+        transaction.status = paymentStatusCheck.data.status;
+        await transaction.save();
+        return res
+          .status(200)
+          .json({ message: "Transaction status updated successfully" });
+      }
+    } catch (error) {
+      console.error("Error updating transaction status:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  };
+  // End
+
+  
   async getReservedBooks(req, res, next) {
     const { page, limit, skip } = paginationService(req);
     let totalPages;
@@ -398,7 +477,7 @@ class TransactionController {
         transactions.map(async (transaction) => {
           const { fine } = calculateFine(transaction.dueDate, new Date());
 
-         
+
           if (fine > 0 && transaction.fine !== fine) {
             await TransactionModel.findByIdAndUpdate(transaction._id, {
               fine: fine,
@@ -466,7 +545,7 @@ class TransactionController {
       /* GET TRANSACTION BY ID */
       const transaction = await TransactionModel.findById(transactionID)
         .populate("user")
-        .populate("book"); 
+        .populate("book");
       if (!transaction) {
         return next(ErrorHandlerService.notFound("Transaction not found !"));
       }
@@ -489,14 +568,12 @@ class TransactionController {
       await sendMail({
         to: transaction.user.email,
         subject: "Renewal Request Accepted",
-        text: `We hope this email finds you well. We wanted to inform you about the status of your recent renewal request for the book titled ${
-          transaction.book.title
-        }.
-        ${
-          renewalStatus === "Accepted"
+        text: `We hope this email finds you well. We wanted to inform you about the status of your recent renewal request for the book titled ${transaction.book.title
+          }.
+        ${renewalStatus === "Accepted"
             ? `Your renewal request has been accepted, and your new due date is ${transaction.dueDate}.`
             : `We regret to inform you that your renewal request has been rejected.`
-        }
+          }
 
         Thank you for using our library services.
 
@@ -747,7 +824,7 @@ class TransactionController {
       return res
         .status(200)
         .json({ message: "Book UnReserved Successfully !", reservedBooks });
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async renewRequest(req, res, next) {

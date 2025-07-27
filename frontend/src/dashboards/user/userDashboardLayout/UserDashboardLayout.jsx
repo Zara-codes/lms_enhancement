@@ -47,32 +47,13 @@ const UserDashboardLayout = () => {
           link : "returned-books",
           icon : <ImBooks/>
         },
-        {
-          id : 4,
-          text : "Recommended",
-          link : "borrowed-books",
-          icon : <FaBook/>
-        }
+        // {
+        //   id : 4,
+        //   text : "Recommended",
+        //   link : "borrowed-books",
+        //   icon : <FaBook/>
+        // }
       ] 
-    },
-    // Payment Integration
-    {
-      id: 3,
-      title : "Fines",
-      listItems:[
-        {
-          id : 1,
-          text : "My Fines",
-          link : "fines",
-          icon : <MdPayment/>
-        },
-        {
-          id : 2,
-          text : "Pay Fines",
-          link : "payment",
-          icon : <MdPayment/>
-        }
-      ]
     },
 
     // end

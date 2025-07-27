@@ -78,24 +78,6 @@ const reservationSchema = new mongoose.Schema({
   },
 });
 
-// const fineSchema = new mongoose.Schema({
-//   transaction: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "Transaction",
-//     required: true,
-//   },
-//   fine: {
-//     type: Number,
-//     required: true,
-//   },
-//   paidDate: {
-//     type: Date,
-//     default: Date.now,
-//   },
-// });
-
-
-// Payment Integration
 
 const fineSchema = new mongoose.Schema({
   transaction: {
@@ -139,9 +121,39 @@ const esewaTransactionSchema = new mongoose.Schema({
 }, {timestamps: true})
 const esewaTransactionModel = mongoose.model("Esewa Transaction", esewaTransactionSchema);
 
+
+
+const payFineSchema = mongoose.Schema(
+  {
+    product_id: {
+        type: String,
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true,
+        min: 0,
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ["PENDING", "COMPLETE", "REUNDED"],
+        default: "PENDING"
+    }
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const PayFineModel = mongoose.model("PayFine", payFineSchema);
+
+// Next Attempt
+
+
 // End
 const ReservationModel = mongoose.model("Reservation", reservationSchema);
 const TransactionModel = mongoose.model("Transaction", transactionSchema);
 const FineModel = mongoose.model("Fine", fineSchema);
 
-export { ReservationModel, TransactionModel, FineModel, esewaTransactionModel };
+export { ReservationModel, TransactionModel, FineModel, esewaTransactionModel, PayFineModel };

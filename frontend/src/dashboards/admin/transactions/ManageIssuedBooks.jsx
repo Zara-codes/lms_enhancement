@@ -183,7 +183,7 @@ const ManageIssueBooks = () => {
               <td>ISBN</td>
               {/* <td>Title</td> */}
               {/* <td>User Name</td> */}
-              <td>Roll Number/Email</td>
+              <td>Email</td>
               <td>Issued Date</td>
               <td>Due Date</td>
               <td>Fine</td>
@@ -234,6 +234,7 @@ const ManageIssueBooks = () => {
                       onClick={() => {
                         setShowFineModal(true);
                         setSelectedTransaction(i);
+                        navigate('/users/dashboard/payment')
                       }}
                     >
                       Pay Fine

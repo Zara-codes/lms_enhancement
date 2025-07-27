@@ -23,13 +23,13 @@ export const debounce = (func, delay) => {
   };
 };
 
-// #############################  MAIN WEBSITE API REQUESTS  #########################
+// MAIN WEBSITE API REQUESTS 
 
 export const getHomePageData = () => api.get("/genral/home-data");
 export const createReview = (_id, data, query) =>
   api.post(`/genral/books/${_id}/reviews?bookType=${query}`, data);
 
-// ######################## AUTHENTICATION REQUESTS #################################
+// AUTHENTICATION REQUESTS 
 export const login = (data) => {
   return api.post("/auth/login", data);
 };
@@ -156,16 +156,16 @@ export const getEBook = (_id) => api.get(`/ebooks/${_id}`);
 export const addNewEBook = (data) =>
   api.post("/ebooks/", data, {
     headers: {
-      "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
+      "Content-Type": "multipart/form-data", 
     },
   });
 export const updateEBook = (_id, data) =>
   api.put(`/ebooks/${_id}/`, data, {
     headers: {
-      "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
+      "Content-Type": "multipart/form-data",
     },
   });
-/* ################################   TRANSACTIONS ######################################### */
+/*   TRANSACTIONS */
 export const getAdminDashboardStats = () =>
   api.get(`transactions/admin-dashboard-stats`);
 export const getAllIssuedBooks = (query, page) =>
@@ -178,7 +178,11 @@ export const getAllReturnedBooks = (page) =>
   api.get(`transactions/returned-books?page=${page}`);
 export const payFine = (data) => api.post("/transactions/pay-fine", data);
 export const ReturnBook = (data) => api.post("transactions/return-book", data);
+// Payment Integration
+export const initiateEsewaPayment = (data) => api.post("/transactions/pay-fine-esewa", data);
+export const esewaPaymentStatus = (data) => api.post("/transactions/pay-fine-status", data);
 
+// End
 /* TO GET USER DETAILS AND CHECK HOW MANY BOOKS IT ALREADY BORROWED */
 export const getUserInfo = (query) =>
   api.get(
@@ -243,8 +247,8 @@ api.interceptors.response.use(
         //  original Request again
         return api.request(originalRequest);
       } catch (error) {
-        // console.log('Error comes in interceptor');
-        // console.log(error);
+        console.log('Error comes in interceptor');
+        console.log(error);
       }
     } else {
       throw error;

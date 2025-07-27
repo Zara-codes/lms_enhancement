@@ -22,7 +22,12 @@ import {
   transactionRouter,
 } from "./routes/index.js";
 import { errorHandlerMiddleware } from "./middlewares/index.js";
-import { EsewaInitiatePayment, paymentStatus } from "./controllers/esewaControllers.js";
+
+// Integration
+// import { getEsewaPaymentHash, verifyEsewaPayment } from "./services/esewa.js"
+// import { PayFineModel } from "./models/transaction-models.js";
+// import PaymentModel from "./models/payment-model.js";
+// End
 
 const app = express();
 app.use(express.json({ limit: "5mb" }));
@@ -62,6 +67,8 @@ mongoose
     console.log(err);
     console.log("====================================");
   });
+
+  
 app.use("/api/auth", authRouter);
 app.use("/api/batches", batchRouter);
 app.use("/api/teachers", teacherRouter);
@@ -115,5 +122,9 @@ httpServer.listen(process.env.PORT, () => {
   console.log(`Server running with Socket.io on port ${process.env.APP_PORT}`);
 });
 
-app.post("/initiate-payment", EsewaInitiatePayment);
-app.post("/payment-status", paymentStatus);
+// // PI
+// import paymentRoutes from "./routes/paymentRoutes.js";
+// app.use("/api/payment", paymentRoutes)
+
+import esewaRouter from "./routes/esewav2Routes.js";
+app.use("/api/payment", esewaRouter);
